@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoBloom ✦ Cipher Studio</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255,182,193,.35), transparent 25%),
+      radial-gradient(circle at 85% 20%, rgba(180,220,255,.35), transparent 25%),
+      linear-gradient(135deg, #fff8fc, #f6f3ff 48%, #eef9ff);
+    color: #39334a;
+  }
+  .wrap { max-width: 1050px; margin: auto; padding: 28px 18px 50px; }
+  .hero {
+    text-align: center;
+    padding: 28px 20px 20px;
+  }
+  .sparkle { font-size: 25px; }
+  h1 { margin: 5px 0; font-size: clamp(32px, 6vw, 58px); letter-spacing: -2px; }
+  .subtitle { color: #776f87; font-size: 16px; }
+  .card {
+    background: rgba(255,255,255,.78);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.95);
+    border-radius: 28px;
+    box-shadow: 0 18px 55px rgba(83,67,105,.12);
+    padding: 25px;
+    margin-top: 18px;
+  }
+  label { display:block; font-weight: 700; margin: 0 0 8px; }
+  textarea, input, select {
+    width: 100%;
+    border: 2px solid #eee5f3;
+    border-radius: 16px;
+    padding: 13px 15px;
+    font: inherit;
+    outline: none;
+    background: #fff;
+    color: #39334a;
+  }
+  textarea { min-height: 125px; resize: vertical; }
+  textarea:focus, input:focus, select:focus { border-color: #c9a7e9; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  .actions { display:flex; gap: 10px; flex-wrap:wrap; margin-top:18px; }
+  button {
+    border:0; border-radius: 999px; padding: 12px 20px; font-weight: 800;
+    cursor:pointer; transition:.18s; font-size:15px;
+  }
+  button:hover { transform: translateY(-2px); }
+  .primary { background:#8d6bd1; color:white; }
+  .secondary { background:#f1eafb; color:#604a85; }
+  .danger { background:#ffe9ef; color:#a24c69; }
+  .output {
+    margin-top: 22px; padding: 18px; border-radius: 20px;
+    background:#fbf9ff; border:1px dashed #d9cbed;
+  }
+  .output pre {
+    white-space: pre-wrap; word-break: break-word; margin:10px 0 0;
+    font-family: Consolas, monospace; line-height:1.55;
+  }
+  .matrix {
+    display:grid; grid-template-columns: repeat(5, 42px); gap:5px;
+    margin-top:10px;
+  }
+  .matrix span {
+    width:42px;height:42px;display:grid;place-items:center;
+    background:#f0e9fa;border-radius:9px;font-weight:800;
+  }
+  .hint { color:#83798f; font-size:13px; margin-top:7px; }
+  .hidden { display:none; }
+  .pill {
+    display:inline-block; padding:5px 10px; border-radius:999px;
+    background:#f4edf9; color:#76579a; font-size:12px; font-weight:700;
+  }
+  footer { text-align:center; color:#8d8495; padding-top:22px; font-size:13px; }
+  @media(max-width:700px) { .grid {grid-template-columns:1fr;} .card{padding:18px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="sparkle">✦ ✧ ✦</div>
+    <h1>CryptoBloom</h1>
+    <div class="subtitle">A cute little cryptography studio • encrypt, decrypt & learn</div>
+  </section>
+
+  <section class="card">
+    <span class="pill">6 classical ciphers</span>
+    <h2>🔐 Turn your plaintext into ciphertext</h2>
+
+    <label for="plain">Plaintext</label>
+    <textarea id="plain" placeholder="Type your message here...">HELLO</textarea>
+
+    <div class="grid">
+      <div>
+        <label for="cipher">Choose cipher</label>
+        <select id="cipher" onchange="showFields()">
+          <option value="caesar">Caesar Cipher</option>
+          <option value="mono">Monoalphabetic Cipher</option>
+          <option value="vigenere">Vigenère Cipher</option>
+          <option value="playfair">Playfair Cipher</option>
+          <option value="hill">Hill Cipher</option>
+          <option value="vernam">Vernam Cipher</option>
+        </select>
+      </div>
+      <div id="keyArea">
+        <label for="key">Key / Shift</label>
+        <input id="key" value="3" placeholder="Enter key">
+        <div id="hint" class="hint">Caesar shift: 3</div>
+      </div>
+    </div>
+
+    <div id="hillArea" class="grid hidden">
+      <div><label>a</label><input id="ha" type="number" value="3"></div>
+      <div><label>b</label><input id="hb" type="number" value="3"></div>
+      <div><label>c</label><input id="hc" type="number" value="2"></div>
+      <div><label>d</label><input id="hd" type="number" value="5"></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="encrypt()">✨ Encrypt</button>
+      <button class="secondary" onclick="decrypt()">↩ Decrypt ciphertext</button>
+      <button class="secondary" onclick="copyResult()">📋 Copy</button>
+      <button class="danger" onclick="clearAll()">♡ Clear</button>
+    </div>
+
+    <div class="output">
+      <strong>Result</strong>
+      <pre id="result">Your ciphertext will appear here ✨</pre>
+      <div id="extra"></div>
+    </div>
+  </section>
+
+  <footer>Made for learning • Caesar • Monoalphabetic • Vigenère • Playfair • Hill • Vernam</footer>
+</div>
+
+<script>
+function cleanLetters(s){ return s.toUpperCase().replace(/[^A-Z]/g,''); }
+
+function egcd(a,b){
+  if(!b) return [a,1,0];
+  const [g,x,y]=egcd(b,a%b);
+  return [g,y,x-Math.floor(a/b)*y];
+}
+function modInv(a,m){
+  a=((a%m)+m)%m;
+  for(let x=1;x<m;x++) if((a*x)%m===1) return x;
+  return null;
+}
+
+function showFields(){
+  const c=document.getElementById('cipher').value;
+  const key=document.getElementById('key');
+  const hint=document.getElementById('hint');
+  const hill=document.getElementById('hillArea');
+  hill.classList.toggle('hidden', c!=='hill');
+
+  if(c==='caesar'){ key.value=3; hint.textContent='Enter a number, e.g. 3.'; }
+  if(c==='mono'){ key.value='QWERTYUIOPASDFGHJKLZXCVBNM'; hint.textContent='Exactly 26 unique letters.'; }
+  if(c==='vigenere'){ key.value='KEY'; hint.textContent='Example: KEY'; }
+  if(c==='playfair'){ key.value='MONARCHY'; hint.textContent='I and J share one cell.'; }
+  if(c==='hill'){ key.value=''; hint.textContent='Uses the 2×2 matrix below.'; }
+  if(c==='vernam'){ key.value='XMCKL'; hint.textContent='For this demo, key length must equal plaintext length.'; }
+}
+
+function caesar(text,k){
+  return [...text].map(ch=>{
+    if(!/[A-Za-z]/.test(ch)) return ch;
+    const base=ch===ch.toUpperCase()?65:97;
+    return String.fromCharCode((ch.charCodeAt(0)-base+k+26)%26+base);
+  }).join('');
+}
+
+function mono(text,key,dec=false){
+  const a='ABCDEFGHIJKLMNOPQRSTUVWXYZ'; key=key.toUpperCase();
+  if(key.length!==26 || new Set(key).size!==26 || !/^[A-Z]+$/.test(key)) throw Error('Monoalphabetic key must contain 26 unique letters.');
+  return [...text].map(ch=>{
+    if(!/[A-Za-z]/.test(ch)) return ch;
+    const upper=ch.toUpperCase();
+    let out=dec ? a[key.indexOf(upper)] : key[a.indexOf(upper)];
+    return ch===ch.toLowerCase()?out.toLowerCase():out;
+  }).join('');
+}
+
+function vigenere(text,key,dec=false){
+  key=cleanLetters(key); if(!key) throw Error('Enter a Vigenère key.');
+  let j=0;
+  return [...text].map(ch=>{
+    if(!/[A-Za-z]/.test(ch)) return ch;
+    const x=ch.toUpperCase().charCodeAt(0)-65;
+    const k=key[j++%key.length].charCodeAt(0)-65;
+    const y=(x+(dec?-k:k)+26)%26;
+    return String.fromCharCode(y+65);
+  }).join('');
+}
+
+function pfMatrix(key){
+  key=cleanLetters(key).replace(/J/g,'I');
+  let s='';
+  for(const ch of key+'ABCDEFGHIKLMNOPQRSTUVWXYZ') if(!s.includes(ch)) s+=ch;
+  return Array.from({length:5},(_,r)=>s.slice(r*5,r*5+5).split(''));
+}
+function pfPos(m,ch){
+  if(ch==='J') ch='I';
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++) if(m[r][c]===ch) return [r,c];
+}
+function pfPrepare(t){
+  t=cleanLetters(t).replace(/J/g,'I');
+  let out='',i=0;
+  while(i<t.length){
+    let a=t[i],b=t[i+1];
+    if(!b){out+=a+'X';i++;continue;}
+    if(a===b){out+=a+'X';i++;}
+    else {out+=a+b;i+=2;}
+  }
+  return out;
+}
+function playfair(text,key,dec=false){
+  const m=pfMatrix(key), t=dec?cleanLetters(text):pfPrepare(text);
+  let out='';
+  for(let i=0;i<t.length;i+=2){
+    const [r1,c1]=pfPos(m,t[i]),[r2,c2]=pfPos(m,t[i+1]);
+    if(r1===r2){
+      const d=dec?-1:1; out+=m[r1][(c1+d+5)%5]+m[r2][(c2+d+5)%5];
+    } else if(c1===c2){
+      const d=dec?-1:1; out+=m[(r1+d+5)%5][c1]+m[(r2+d+5)%5][c2];
+    } else out+=m[r1][c2]+m[r2][c1];
+  }
+  return {text:out,matrix:m,prepared:dec?null:t};
+}
+
+function hillMatrix(){
+  return [
+    [Number(document.getElementById('ha').value),Number(document.getElementById('hb').value)],
+    [Number(document.getElementById('hc').value),Number(document.getElementById('hd').value)]
+  ];
+}
+function hill(text,K,dec=false){
+  let M=K;
+  if(dec){
+    const det=((M[0][0]*M[1][1]-M[0][1]*M[1][0])%26+26)%26;
+    const inv=modInv(det,26); if(inv===null) throw Error('This Hill key matrix has no inverse modulo 26.');
+    M=[
+      [(M[1][1]*inv)%26,((-M[0][1]*inv)%26+26)%26],
+      [((-M[1][0]*inv)%26+26)%26,(M[0][0]*inv)%26]
+    ];
+  }
+  text=cleanLetters(text); if(text.length%2) text+='X';
+  let out='';
+  for(let i=0;i<text.length;i+=2){
+    const x=text.charCodeAt(i)-65,y=text.charCodeAt(i+1)-65;
+    out+=String.fromCharCode(((M[0][0]*x+M[0][1]*y)%26)+65);
+    out+=String.fromCharCode(((M[1][0]*x+M[1][1]*y)%26)+65);
+  }
+  return out;
+}
+
+function vernam(text,key){
+  if(text.length!==key.length) throw Error('For this Vernam demo, key length must equal plaintext/ciphertext length.');
+  let out='';
+  for(let i=0;i<text.length;i++) out+=String.fromCharCode(text.charCodeAt(i)^key.charCodeAt(i));
+  return out;
+}
+
+function getKey(){ return document.getElementById('key').value; }
+
+function run(mode){
+  try{
+    const c=document.getElementById('cipher').value;
+    const input=document.getElementById('plain').value;
+    let out='',extra='';
+    if(c==='caesar') out=caesar(input, Number(getKey())*(mode==='decrypt'?-1:1));
+    if(c==='mono') out=mono(input,getKey(),mode==='decrypt');
+    if(c==='vigenere') out=vigenere(input,getKey(),mode==='decrypt');
+    if(c==='playfair'){
+      const p=playfair(input,getKey(),mode==='decrypt');
+      out=p.text;
+      extra='<div class="hint">Prepared text: '+(p.prepared||'—')+'</div><div class="matrix">'+p.matrix.flat().map(x=>'<span>'+x+'</span>').join('')+'</div>';
+    }
+    if(c==='hill') out=hill(input,hillMatrix(),mode==='decrypt');
+    if(c==='vernam'){
+      const raw=vernam(input,getKey());
+      out=mode==='encrypt'?raw:raw;
+      out=''+out;
+      extra='<div class="hint">Vernam output may contain invisible/special characters; the display below uses a safe escaped representation.</div>';
+      out=JSON.stringify(out);
+    }
+    document.getElementById('result').textContent=out;
+    document.getElementById('extra').innerHTML=extra;
+  }catch(e){ document.getElementById('result').textContent='⚠ '+e.message; document.getElementById('extra').innerHTML=''; }
+}
+function encrypt(){run('encrypt');}
+function decrypt(){run('decrypt');}
+function copyResult(){
+  navigator.clipboard.writeText(document.getElementById('result').textContent);
+}
+function clearAll(){
+  document.getElementById('plain').value='';
+  document.getElementById('result').textContent='Your ciphertext will appear here ✨';
+  document.getElementById('extra').innerHTML='';
+}
+showFields();
+</script>
+</body>
+</html>
